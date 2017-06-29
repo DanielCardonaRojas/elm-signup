@@ -9,15 +9,26 @@ main = Html.program {init = init, view = view, subscriptions = subscriptions, up
 
 ---------------- Auxliary Types ----------
 type alias Validation = Input -> Maybe String
-type alias Validator = Input -> List (InputName, Validation) -> List String
+type alias Validator = Input -> List Validation -> List String
 type alias InputName = String
 
---^ Since the server will respond with {status: "failed|error", message:"..."} or {status:"ok", data: {}}
+--| Since the server will respond with {status: "failed|error", message:"..."} or {status:"ok", data: {}}
 type alias ServerResponse a = Result String a 
+
+type ValidationStyle 
+    = Mass --^ Show all validations at a time
+    | Queued  --^ Show message from first failed validation
+
+type ValidationTrigger
+    = OnInputChange
+    | OnBlur
+
 ---------------- Actions -----------------
 type Action 
     = NoAction
     | InputChanged Input String
+    | FocusedOut Input
+    | FocusedIn Input
     | ServerReplied (Result Http.Error (ServerResponse String))
     | SubmitForm
 
@@ -32,14 +43,21 @@ type alias Input =
     , placeholder : String
     , inputType : String
     , errors : List String
+    , validationStyle : ValidationStyle
+    , hideValidations : Bool
     }
+
+-- | Short hand input constructors
+textInput name label placeholder style = Input "" name label placeholder "text" [] style True
+emailInput name label placeholder style = Input "" name label placeholder "email" [] style True
+passwordInput name label style = Input "" name label "" "password" [] style True
 
 initialModel = 
     let 
         inputs = 
-            [ Input "" "user_name" "Username: " "Enter your username" "text" []
-            , Input "" "user_mail" "Email: " "example@gmail.com" "email" []
-            , Input "" "user_passwd" "Password: " "" "password" []
+            [ textInput "user_name" "Username: " "Enter your username" Mass
+            , emailInput "user_mail" "Email: " "example@gmail.com" Mass
+            , passwordInput "user_passwd" "Password: " Queued 
             ]
     in 
         Model inputs "/signup" (Ok "") ""
@@ -73,16 +91,23 @@ viewInput : Input -> Html Action
 viewInput i =
     let 
         inputField = 
-            div [] [input [onInput (InputChanged i), placeholder i.placeholder
-                          , value i.value, name i.name, type_ i.inputType, class "form-control"][]
+            div [] [input [onInput (InputChanged i), onBlur (FocusedOut i), onFocus (FocusedIn i)
+                          , placeholder i.placeholder, value i.value, name i.name, type_ i.inputType, class "form-control"][]
                    ]
-        errorList errors =  List.map (\e -> li [][text e]) errors
+        errorList i =  
+        if i.hideValidations then
+            [text ""] 
+        else
+            if i.validationStyle == Queued then 
+                [li [] (List.map text (List.take 1 i.errors))] 
+            else 
+                List.map (\e -> li [][text e]) i.errors
     in
-    div [class "form-group"]
-        [ label [for i.name] [text i.label] 
-        , inputField 
-        , ul [class "input-error"] <| errorList i.errors
-        ]
+        div [class "form-group"]
+            [ label [for i.name] [text i.label] 
+            , inputField 
+            , ul [class "input-error"] <| errorList i
+            ]
 ---------------- Update -----------------
 
 update : Action -> Model -> (Model, Cmd Action) 
@@ -92,7 +117,13 @@ update action model =
 
         InputChanged i newValue -> 
             ({model | inputs = List.map (updateInput i newValue) model.inputs}, Cmd.none)
+        
+        FocusedOut i ->
+            (changeFocusOnInput model i False, Cmd.none)
 
+        FocusedIn i ->
+            (changeFocusOnInput model i True, Cmd.none)
+        
         SubmitForm -> 
             (model, loginCmd "http://localhost:5000/signup" model)
 
@@ -110,6 +141,14 @@ updateInput changedInput newValue storedInput =
             { updatedField | errors = inputValidator updatedField validations}
     else
         storedInput
+
+changeFocusOnInput : Model -> Input -> Bool -> Model
+changeFocusOnInput model input b = 
+    let 
+        modifiedInputs = List.map (\i -> if i.name == input.name then {i | hideValidations = b} else i) model.inputs
+    in
+        {model | inputs = modifiedInputs }
+
 ---------------- Subscriptions -----------------
 
 subscriptions model =  Sub.none
@@ -137,8 +176,8 @@ loginCmd url model =
 ---------------- Logic -----------------
 validations : List (InputName, Validation)
 validations = 
-    [ ("user_name", withPredicate (not << String.isEmpty) "User name cant be empty" )
-    , ("user_mail", withPredicate (String.contains "@") "Doesn't seem like a valid password")
+    [ ("user_name", withPredicate (not << String.isEmpty) "User name can't be empty" )
+    , ("user_mail", withPredicate (String.contains "@") "Doesn't seem like a valid email")
     , ("user_passwd", withPredicate (minLength 6) "Passwords must be at least 6 characters long")
     , ("user_name", withPredicate (minLength 3) "User name is too short")
     , ("user_name", withPredicate (not << String.contains " ") "User name cant contain spaces")
@@ -152,12 +191,9 @@ inputValidator i validations =
 formErrors : List Input -> Int
 formErrors inputs = List.foldl (\i acc -> List.length i.errors + acc) 0 inputs
 ---------------- Predicates -----------------
+-- | Build a validations from a predicate and some message string
 withPredicate : (String -> Bool) -> String -> Validation
-withPredicate p errorMessage = \i ->
-    if p i.value then 
-        Nothing
-    else
-        Just errorMessage
+withPredicate p errorMessage = \i -> if p i.value then Nothing else Just errorMessage
 
 minLength : Int -> String -> Bool
 minLength n s = String.length s >= n

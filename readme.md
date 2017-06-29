@@ -1,7 +1,22 @@
 # Elm Signup form with client and server side validation
 
-This is just a simple attempt at understanding how to write forms in elm.
+Inputs can specify how they want their validations displayd (on at time or a list of all failed validations)
+inputs can specify which event triggers the display of validation messages `OnInputchange or OnBlur`
 
+In this example a server can validate the submission of the form, it is expected that the server 
+responds with this structure:
+
+Failure or some server error
+```json
+{status: "error", message: "Some exception..."}
+# OR
+{status: "fail", message: "Some failed because ..."}
+```
+
+Succeeds
+```json
+{status: "ok", data: "Some confirmation string ..."}
+```
 
 **Core types**
 
@@ -16,11 +31,13 @@ type alias InputName = String
 ```elm
 type alias Input = 
     { value : String
-    , name : InputName
+    , name : String
     , label : String
     , placeholder : String
     , inputType : String
     , errors : List String
+    , validationStyle : ValidationStyle
+    , hideValidations : Bool
     }
 ```
 
@@ -53,6 +70,7 @@ python server.py
 
 # Todo:
 
-- Configure to switch between single and multiple errors per input field.
 - Use flags program in elm to pass in the configuration and window location
 - Create helper predicates to validate
+- Implement the Validation trigger option (OnInputChange or OnBlur)
+- Turn into a reusable modules, (just specify the inputs and the post url)

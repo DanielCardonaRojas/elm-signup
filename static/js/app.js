@@ -9074,7 +9074,7 @@ var _user$project$Main$validations = {
 			function (_p0) {
 				return !_elm_lang$core$String$isEmpty(_p0);
 			},
-			'User name cant be empty')
+			'User name can\'t be empty')
 	},
 	_1: {
 		ctor: '::',
@@ -9084,7 +9084,7 @@ var _user$project$Main$validations = {
 			_1: A2(
 				_user$project$Main$withPredicate,
 				_elm_lang$core$String$contains('@'),
-				'Doesn\'t seem like a valid password')
+				'Doesn\'t seem like a valid email')
 		},
 		_1: {
 			ctor: '::',
@@ -9162,6 +9162,20 @@ var _user$project$Main$serverResponseDecoder = function (d) {
 var _user$project$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
+var _user$project$Main$changeFocusOnInput = F3(
+	function (model, input, b) {
+		var modifiedInputs = A2(
+			_elm_lang$core$List$map,
+			function (i) {
+				return _elm_lang$core$Native_Utils.eq(i.name, input.name) ? _elm_lang$core$Native_Utils.update(
+					i,
+					{hideValidations: b}) : i;
+			},
+			model.inputs);
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{inputs: modifiedInputs});
+	});
 var _user$project$Main$updateInput = F3(
 	function (changedInput, newValue, storedInput) {
 		if (_elm_lang$core$Native_Utils.eq(changedInput.name, storedInput.name)) {
@@ -9182,41 +9196,61 @@ var _user$project$Main$Model = F4(
 	function (a, b, c, d) {
 		return {inputs: a, postUrl: b, serverResponse: c, programErrors: d};
 	});
-var _user$project$Main$Input = F6(
-	function (a, b, c, d, e, f) {
-		return {value: a, name: b, label: c, placeholder: d, inputType: e, errors: f};
+var _user$project$Main$Input = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {value: a, name: b, label: c, placeholder: d, inputType: e, errors: f, validationStyle: g, hideValidations: h};
 	});
+var _user$project$Main$textInput = F4(
+	function (name, label, placeholder, style) {
+		return A8(
+			_user$project$Main$Input,
+			'',
+			name,
+			label,
+			placeholder,
+			'text',
+			{ctor: '[]'},
+			style,
+			true);
+	});
+var _user$project$Main$emailInput = F4(
+	function (name, label, placeholder, style) {
+		return A8(
+			_user$project$Main$Input,
+			'',
+			name,
+			label,
+			placeholder,
+			'email',
+			{ctor: '[]'},
+			style,
+			true);
+	});
+var _user$project$Main$passwordInput = F3(
+	function (name, label, style) {
+		return A8(
+			_user$project$Main$Input,
+			'',
+			name,
+			label,
+			'',
+			'password',
+			{ctor: '[]'},
+			style,
+			true);
+	});
+var _user$project$Main$Queued = {ctor: 'Queued'};
+var _user$project$Main$Mass = {ctor: 'Mass'};
 var _user$project$Main$initialModel = function () {
 	var inputs = {
 		ctor: '::',
-		_0: A6(
-			_user$project$Main$Input,
-			'',
-			'user_name',
-			'Username: ',
-			'Enter your username',
-			'text',
-			{ctor: '[]'}),
+		_0: A4(_user$project$Main$textInput, 'user_name', 'Username: ', 'Enter your username', _user$project$Main$Mass),
 		_1: {
 			ctor: '::',
-			_0: A6(
-				_user$project$Main$Input,
-				'',
-				'user_mail',
-				'Email: ',
-				'example@gmail.com',
-				'email',
-				{ctor: '[]'}),
+			_0: A4(_user$project$Main$emailInput, 'user_mail', 'Email: ', 'example@gmail.com', _user$project$Main$Mass),
 			_1: {
 				ctor: '::',
-				_0: A6(
-					_user$project$Main$Input,
-					'',
-					'user_passwd',
-					'Password: ',
-					'',
-					'password',
-					{ctor: '[]'}),
+				_0: A3(_user$project$Main$passwordInput, 'user_passwd', 'Password: ', _user$project$Main$Queued),
 				_1: {ctor: '[]'}
 			}
 		}
@@ -9229,6 +9263,8 @@ var _user$project$Main$initialModel = function () {
 		'');
 }();
 var _user$project$Main$init = {ctor: '_Tuple2', _0: _user$project$Main$initialModel, _1: _elm_lang$core$Platform_Cmd$none};
+var _user$project$Main$OnBlur = {ctor: 'OnBlur'};
+var _user$project$Main$OnInputChange = {ctor: 'OnInputChange'};
 var _user$project$Main$SubmitForm = {ctor: 'SubmitForm'};
 var _user$project$Main$ServerReplied = function (a) {
 	return {ctor: 'ServerReplied', _0: a};
@@ -9270,6 +9306,18 @@ var _user$project$Main$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'FocusedOut':
+				return {
+					ctor: '_Tuple2',
+					_0: A3(_user$project$Main$changeFocusOnInput, model, _p3._0, false),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'FocusedIn':
+				return {
+					ctor: '_Tuple2',
+					_0: A3(_user$project$Main$changeFocusOnInput, model, _p3._0, true),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'SubmitForm':
 				return {
 					ctor: '_Tuple2',
@@ -9299,13 +9347,33 @@ var _user$project$Main$update = F2(
 				}
 		}
 	});
+var _user$project$Main$FocusedIn = function (a) {
+	return {ctor: 'FocusedIn', _0: a};
+};
+var _user$project$Main$FocusedOut = function (a) {
+	return {ctor: 'FocusedOut', _0: a};
+};
 var _user$project$Main$InputChanged = F2(
 	function (a, b) {
 		return {ctor: 'InputChanged', _0: a, _1: b};
 	});
 var _user$project$Main$viewInput = function (i) {
-	var errorList = function (errors) {
-		return A2(
+	var errorList = function (i) {
+		return i.hideValidations ? {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		} : (_elm_lang$core$Native_Utils.eq(i.validationStyle, _user$project$Main$Queued) ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$li,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$html$Html$text,
+					A2(_elm_lang$core$List$take, 1, i.errors))),
+			_1: {ctor: '[]'}
+		} : A2(
 			_elm_lang$core$List$map,
 			function (e) {
 				return A2(
@@ -9317,7 +9385,7 @@ var _user$project$Main$viewInput = function (i) {
 						_1: {ctor: '[]'}
 					});
 			},
-			errors);
+			i.errors));
 	};
 	var inputField = A2(
 		_elm_lang$html$Html$div,
@@ -9332,20 +9400,30 @@ var _user$project$Main$viewInput = function (i) {
 						_user$project$Main$InputChanged(i)),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$placeholder(i.placeholder),
+						_0: _elm_lang$html$Html_Events$onBlur(
+							_user$project$Main$FocusedOut(i)),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$value(i.value),
+							_0: _elm_lang$html$Html_Events$onFocus(
+								_user$project$Main$FocusedIn(i)),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$name(i.name),
+								_0: _elm_lang$html$Html_Attributes$placeholder(i.placeholder),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$type_(i.inputType),
+									_0: _elm_lang$html$Html_Attributes$value(i.value),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('form-control'),
-										_1: {ctor: '[]'}
+										_0: _elm_lang$html$Html_Attributes$name(i.name),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$type_(i.inputType),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('form-control'),
+												_1: {ctor: '[]'}
+											}
+										}
 									}
 								}
 							}
@@ -9388,7 +9466,7 @@ var _user$project$Main$viewInput = function (i) {
 							_0: _elm_lang$html$Html_Attributes$class('input-error'),
 							_1: {ctor: '[]'}
 						},
-						errorList(i.errors)),
+						errorList(i)),
 					_1: {ctor: '[]'}
 				}
 			}

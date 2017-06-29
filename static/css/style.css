@@ -12,3 +12,9 @@
     top: 15px;
     color: rebeccapurple;
 }
+
+ul.input-error {
+    color: #ec3f3f;
+    list-style: none;
+	text-indent: -2.5em;
+}
