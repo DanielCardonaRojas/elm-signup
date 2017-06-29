@@ -1,0 +1,14 @@
+.elm-app.row {
+    margin-top: 10rem;
+}
+
+.elm-form {
+    background: #d8eef0;
+    padding: 50px;
+}
+
+.server-response {
+    position: absolute;
+    top: 15px;
+    color: rebeccapurple;
+}
