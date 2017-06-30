@@ -1,6 +1,6 @@
 # Elm Signup form with client and server side validation
 
-Inputs can specify how they want their validations displayd (on at time or a list of all failed validations)
+Inputs can specify how they want their validations displayed (one at time or a list of all failed validations) (`Queued or Mass`)
 inputs can specify which event triggers the display of validation messages `OnInputchange or OnBlur`
 
 In this example a server can validate the submission of the form, it is expected that the server 
@@ -16,6 +16,16 @@ Failure or some server error
 Succeeds
 ```json
 {status: "ok", data: "Some confirmation string ..."}
+```
+
+## Usage
+
+Import Form module define a list of inputs a post url and list of validations a associated with an inputs name.
+
+```elm
+import Form exposing (..)
+-- formMainProgram : List Input -> URL -> List (InputName, Validation) -> Program Never Model Action
+main = formMainProgram inputs "http://localhost:5000/signup" validations
 ```
 
 **Core types**
@@ -65,12 +75,14 @@ virtualenv venv
 source venv/bin/activate
 pip install -r requirements.txt
 python server.py
-#Visit localhost:5000
+# Visit localhost:5000
+# Automatic compilation of script using  entr
+cd client
+./develop.sh
 ```
 
 # Todo:
 
 - Use flags program in elm to pass in the configuration and window location
-- Create helper predicates to validate
 - Implement the Validation trigger option (OnInputChange or OnBlur)
-- Turn into a reusable modules, (just specify the inputs and the post url)
+- Support some form of validation that allows an input validation to succeed or fail depending on another input value 

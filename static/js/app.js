@@ -9033,17 +9033,11 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
-var _user$project$Main$minLength = F2(
-	function (n, s) {
-		return _elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$String$length(s),
-			n) > -1;
-	});
-var _user$project$Main$withPredicate = F3(
+var _user$project$Form$withPredicate = F3(
 	function (p, errorMessage, i) {
 		return p(i.value) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(errorMessage);
 	});
-var _user$project$Main$formErrors = function (inputs) {
+var _user$project$Form$formErrors = function (inputs) {
 	return A3(
 		_elm_lang$core$List$foldl,
 		F2(
@@ -9053,7 +9047,7 @@ var _user$project$Main$formErrors = function (inputs) {
 		0,
 		inputs);
 };
-var _user$project$Main$inputValidator = F2(
+var _user$project$Form$inputValidator = F2(
 	function (i, validations) {
 		return A2(
 			_elm_lang$core$List$filterMap,
@@ -9064,72 +9058,12 @@ var _user$project$Main$inputValidator = F2(
 			},
 			validations);
 	});
-var _user$project$Main$validations = {
-	ctor: '::',
-	_0: {
-		ctor: '_Tuple2',
-		_0: 'user_name',
-		_1: A2(
-			_user$project$Main$withPredicate,
-			function (_p0) {
-				return !_elm_lang$core$String$isEmpty(_p0);
-			},
-			'User name can\'t be empty')
-	},
-	_1: {
-		ctor: '::',
-		_0: {
-			ctor: '_Tuple2',
-			_0: 'user_mail',
-			_1: A2(
-				_user$project$Main$withPredicate,
-				_elm_lang$core$String$contains('@'),
-				'Doesn\'t seem like a valid email')
-		},
-		_1: {
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'user_passwd',
-				_1: A2(
-					_user$project$Main$withPredicate,
-					_user$project$Main$minLength(6),
-					'Passwords must be at least 6 characters long')
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'user_name',
-					_1: A2(
-						_user$project$Main$withPredicate,
-						_user$project$Main$minLength(3),
-						'User name is too short')
-				},
-				_1: {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'user_name',
-						_1: A2(
-							_user$project$Main$withPredicate,
-							function (_p1) {
-								return !A2(_elm_lang$core$String$contains, ' ', _p1);
-							},
-							'User name cant contain spaces')
-					},
-					_1: {ctor: '[]'}
-				}
-			}
-		}
-	}
-};
-var _user$project$Main$serverResponseDecoder = function (d) {
+var _user$project$Form$serverResponseDecoder = function (d) {
 	return A2(
 		_elm_lang$core$Json_Decode$andThen,
 		function (m) {
-			var _p2 = _elm_lang$core$String$toLower(m);
-			switch (_p2) {
+			var _p0 = _elm_lang$core$String$toLower(m);
+			switch (_p0) {
 				case 'ok':
 					return A2(
 						_elm_lang$core$Json_Decode$map,
@@ -9159,10 +9093,10 @@ var _user$project$Main$serverResponseDecoder = function (d) {
 		},
 		A2(_elm_lang$core$Json_Decode$field, 'status', _elm_lang$core$Json_Decode$string));
 };
-var _user$project$Main$subscriptions = function (model) {
+var _user$project$Form$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _user$project$Main$changeFocusOnInput = F3(
+var _user$project$Form$toggleValidationsOnInput = F3(
 	function (model, input, b) {
 		var modifiedInputs = A2(
 			_elm_lang$core$List$map,
@@ -9176,8 +9110,8 @@ var _user$project$Main$changeFocusOnInput = F3(
 			model,
 			{inputs: modifiedInputs});
 	});
-var _user$project$Main$updateInput = F3(
-	function (changedInput, newValue, storedInput) {
+var _user$project$Form$updateInput = F4(
+	function (changedInput, newValue, validations, storedInput) {
 		if (_elm_lang$core$Native_Utils.eq(changedInput.name, storedInput.name)) {
 			var updatedField = _elm_lang$core$Native_Utils.update(
 				changedInput,
@@ -9185,25 +9119,34 @@ var _user$project$Main$updateInput = F3(
 			return _elm_lang$core$Native_Utils.update(
 				updatedField,
 				{
-					errors: A2(_user$project$Main$inputValidator, updatedField, _user$project$Main$validations)
+					errors: A2(_user$project$Form$inputValidator, updatedField, validations)
 				});
 		} else {
 			return storedInput;
 		}
 	});
-var _user$project$Main$singleErrorMessages = true;
-var _user$project$Main$Model = F4(
-	function (a, b, c, d) {
-		return {inputs: a, postUrl: b, serverResponse: c, programErrors: d};
+var _user$project$Form$initialModelWith = F3(
+	function (inputs, postUrl, validations) {
+		return {
+			inputs: inputs,
+			postUrl: postUrl,
+			serverResponse: _elm_lang$core$Result$Ok(''),
+			programErrors: '',
+			validations: validations
+		};
 	});
-var _user$project$Main$Input = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {value: a, name: b, label: c, placeholder: d, inputType: e, errors: f, validationStyle: g, hideValidations: h};
+var _user$project$Form$Model = F5(
+	function (a, b, c, d, e) {
+		return {inputs: a, postUrl: b, serverResponse: c, programErrors: d, validations: e};
 	});
-var _user$project$Main$textInput = F4(
-	function (name, label, placeholder, style) {
-		return A8(
-			_user$project$Main$Input,
+var _user$project$Form$Input = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {value: a, name: b, label: c, placeholder: d, inputType: e, errors: f, validationStyle: g, validationTrigger: h, hideValidations: i};
+	});
+var _user$project$Form$textInputWithTrigger = F5(
+	function (trigger, name, label, placeholder, style) {
+		return A9(
+			_user$project$Form$Input,
 			'',
 			name,
 			label,
@@ -9211,12 +9154,13 @@ var _user$project$Main$textInput = F4(
 			'text',
 			{ctor: '[]'},
 			style,
+			trigger,
 			true);
 	});
-var _user$project$Main$emailInput = F4(
-	function (name, label, placeholder, style) {
-		return A8(
-			_user$project$Main$Input,
+var _user$project$Form$emailInputWithTrigger = F5(
+	function (trigger, name, label, placeholder, style) {
+		return A9(
+			_user$project$Form$Input,
 			'',
 			name,
 			label,
@@ -9224,12 +9168,13 @@ var _user$project$Main$emailInput = F4(
 			'email',
 			{ctor: '[]'},
 			style,
+			trigger,
 			true);
 	});
-var _user$project$Main$passwordInput = F3(
-	function (name, label, style) {
-		return A8(
-			_user$project$Main$Input,
+var _user$project$Form$passwordInputWithTrigger = F4(
+	function (trigger, name, label, style) {
+		return A9(
+			_user$project$Form$Input,
 			'',
 			name,
 			label,
@@ -9237,101 +9182,93 @@ var _user$project$Main$passwordInput = F3(
 			'password',
 			{ctor: '[]'},
 			style,
+			trigger,
 			true);
 	});
-var _user$project$Main$Queued = {ctor: 'Queued'};
-var _user$project$Main$Mass = {ctor: 'Mass'};
-var _user$project$Main$initialModel = function () {
-	var inputs = {
-		ctor: '::',
-		_0: A4(_user$project$Main$textInput, 'user_name', 'Username: ', 'Enter your username', _user$project$Main$Mass),
-		_1: {
-			ctor: '::',
-			_0: A4(_user$project$Main$emailInput, 'user_mail', 'Email: ', 'example@gmail.com', _user$project$Main$Mass),
-			_1: {
-				ctor: '::',
-				_0: A3(_user$project$Main$passwordInput, 'user_passwd', 'Password: ', _user$project$Main$Queued),
-				_1: {ctor: '[]'}
-			}
-		}
-	};
-	return A4(
-		_user$project$Main$Model,
-		inputs,
-		'/signup',
-		_elm_lang$core$Result$Ok(''),
-		'');
-}();
-var _user$project$Main$init = {ctor: '_Tuple2', _0: _user$project$Main$initialModel, _1: _elm_lang$core$Platform_Cmd$none};
-var _user$project$Main$OnBlur = {ctor: 'OnBlur'};
-var _user$project$Main$OnInputChange = {ctor: 'OnInputChange'};
-var _user$project$Main$SubmitForm = {ctor: 'SubmitForm'};
-var _user$project$Main$ServerReplied = function (a) {
+var _user$project$Form$Queued = {ctor: 'Queued'};
+var _user$project$Form$Mass = {ctor: 'Mass'};
+var _user$project$Form$OnBlur = {ctor: 'OnBlur'};
+var _user$project$Form$textInput = F4(
+	function (name, label, placeholder, style) {
+		return A5(_user$project$Form$textInputWithTrigger, _user$project$Form$OnBlur, name, label, placeholder, style);
+	});
+var _user$project$Form$emailInput = F4(
+	function (name, label, placeholder, style) {
+		return A5(_user$project$Form$emailInputWithTrigger, _user$project$Form$OnBlur, name, label, placeholder, style);
+	});
+var _user$project$Form$passwordInput = F3(
+	function (name, label, style) {
+		return A4(_user$project$Form$passwordInputWithTrigger, _user$project$Form$OnBlur, name, label, style);
+	});
+var _user$project$Form$OnInputChange = {ctor: 'OnInputChange'};
+var _user$project$Form$SubmitForm = {ctor: 'SubmitForm'};
+var _user$project$Form$ServerReplied = function (a) {
 	return {ctor: 'ServerReplied', _0: a};
 };
-var _user$project$Main$loginCmd = F2(
-	function (url, model) {
-		var loginBody = _elm_lang$http$Http$multipartBody(
-			A2(
-				_elm_lang$core$List$map,
-				function (i) {
-					return A2(_elm_lang$http$Http$stringPart, i.name, i.value);
-				},
-				model.inputs));
-		return A2(
-			_elm_lang$http$Http$send,
-			_user$project$Main$ServerReplied,
-			A3(
-				_elm_lang$http$Http$post,
-				url,
-				loginBody,
-				_user$project$Main$serverResponseDecoder(_elm_lang$core$Json_Decode$string)));
-	});
-var _user$project$Main$update = F2(
+var _user$project$Form$loginCmd = function (model) {
+	var loginBody = _elm_lang$http$Http$multipartBody(
+		A2(
+			_elm_lang$core$List$map,
+			function (i) {
+				return A2(_elm_lang$http$Http$stringPart, i.name, i.value);
+			},
+			model.inputs));
+	return A2(
+		_elm_lang$http$Http$send,
+		_user$project$Form$ServerReplied,
+		A3(
+			_elm_lang$http$Http$post,
+			model.postUrl,
+			loginBody,
+			_user$project$Form$serverResponseDecoder(_elm_lang$core$Json_Decode$string)));
+};
+var _user$project$Form$update = F2(
 	function (action, model) {
-		var _p3 = action;
-		switch (_p3.ctor) {
+		var _p1 = action;
+		switch (_p1.ctor) {
 			case 'NoAction':
-				return {ctor: '_Tuple2', _0: _user$project$Main$initialModel, _1: _elm_lang$core$Platform_Cmd$none};
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'InputChanged':
-				return {
+				var _p2 = _p1._0;
+				var updatedModel = _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						inputs: A2(
+							_elm_lang$core$List$map,
+							A3(_user$project$Form$updateInput, _p2, _p1._1, model.validations),
+							model.inputs)
+					});
+				return (!_elm_lang$core$Native_Utils.eq(_p2.validationTrigger, _user$project$Form$OnInputChange)) ? {ctor: '_Tuple2', _0: updatedModel, _1: _elm_lang$core$Platform_Cmd$none} : {
 					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							inputs: A2(
-								_elm_lang$core$List$map,
-								A2(_user$project$Main$updateInput, _p3._0, _p3._1),
-								model.inputs)
-						}),
+					_0: A3(_user$project$Form$toggleValidationsOnInput, updatedModel, _p2, false),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'FocusedOut':
 				return {
 					ctor: '_Tuple2',
-					_0: A3(_user$project$Main$changeFocusOnInput, model, _p3._0, false),
+					_0: A3(_user$project$Form$toggleValidationsOnInput, model, _p1._0, false),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'FocusedIn':
 				return {
 					ctor: '_Tuple2',
-					_0: A3(_user$project$Main$changeFocusOnInput, model, _p3._0, true),
+					_0: A3(_user$project$Form$toggleValidationsOnInput, model, _p1._0, true),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'SubmitForm':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: A2(_user$project$Main$loginCmd, 'http://localhost:5000/signup', model)
+					_1: _user$project$Form$loginCmd(model)
 				};
 			default:
-				var _p4 = _p3._0;
-				if (_p4.ctor === 'Ok') {
+				var _p3 = _p1._0;
+				if (_p3.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{serverResponse: _p4._0}),
+							{serverResponse: _p3._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -9340,30 +9277,30 @@ var _user$project$Main$update = F2(
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								programErrors: _elm_lang$core$Basics$toString(_p4._0)
+								programErrors: _elm_lang$core$Basics$toString(_p3._0)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
 		}
 	});
-var _user$project$Main$FocusedIn = function (a) {
+var _user$project$Form$FocusedIn = function (a) {
 	return {ctor: 'FocusedIn', _0: a};
 };
-var _user$project$Main$FocusedOut = function (a) {
+var _user$project$Form$FocusedOut = function (a) {
 	return {ctor: 'FocusedOut', _0: a};
 };
-var _user$project$Main$InputChanged = F2(
+var _user$project$Form$InputChanged = F2(
 	function (a, b) {
 		return {ctor: 'InputChanged', _0: a, _1: b};
 	});
-var _user$project$Main$viewInput = function (i) {
+var _user$project$Form$viewInput = function (i) {
 	var errorList = function (i) {
 		return i.hideValidations ? {
 			ctor: '::',
 			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
-		} : (_elm_lang$core$Native_Utils.eq(i.validationStyle, _user$project$Main$Queued) ? {
+		} : (_elm_lang$core$Native_Utils.eq(i.validationStyle, _user$project$Form$Queued) ? {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$li,
@@ -9397,15 +9334,15 @@ var _user$project$Main$viewInput = function (i) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Events$onInput(
-						_user$project$Main$InputChanged(i)),
+						_user$project$Form$InputChanged(i)),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onBlur(
-							_user$project$Main$FocusedOut(i)),
+							_user$project$Form$FocusedOut(i)),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onFocus(
-								_user$project$Main$FocusedIn(i)),
+								_user$project$Form$FocusedIn(i)),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$placeholder(i.placeholder),
@@ -9472,9 +9409,9 @@ var _user$project$Main$viewInput = function (i) {
 			}
 		});
 };
-var _user$project$Main$view = function (model) {
+var _user$project$Form$view = function (model) {
 	var submitButton = (_elm_lang$core$Native_Utils.cmp(
-		_user$project$Main$formErrors(model.inputs),
+		_user$project$Form$formErrors(model.inputs),
 		0) > 0) ? A2(
 		_elm_lang$html$Html$button,
 		{
@@ -9490,7 +9427,7 @@ var _user$project$Main$view = function (model) {
 		_elm_lang$html$Html$button,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$SubmitForm),
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$Form$SubmitForm),
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Attributes$class('btn btn-warning form-control'),
@@ -9503,8 +9440,8 @@ var _user$project$Main$view = function (model) {
 			_1: {ctor: '[]'}
 		});
 	var serverResponse = function () {
-		var _p5 = model.serverResponse;
-		if (_p5.ctor === 'Ok') {
+		var _p4 = model.serverResponse;
+		if (_p4.ctor === 'Ok') {
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -9514,7 +9451,7 @@ var _user$project$Main$view = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p5._0),
+					_0: _elm_lang$html$Html$text(_p4._0),
 					_1: {ctor: '[]'}
 				});
 		} else {
@@ -9527,7 +9464,7 @@ var _user$project$Main$view = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p5._0),
+					_0: _elm_lang$html$Html$text(_p4._0),
 					_1: {ctor: '[]'}
 				});
 		}
@@ -9541,7 +9478,7 @@ var _user$project$Main$view = function (model) {
 		},
 		A2(
 			_elm_lang$core$Basics_ops['++'],
-			A2(_elm_lang$core$List$map, _user$project$Main$viewInput, model.inputs),
+			A2(_elm_lang$core$List$map, _user$project$Form$viewInput, model.inputs),
 			{
 				ctor: '::',
 				_0: submitButton,
@@ -9567,9 +9504,106 @@ var _user$project$Main$view = function (model) {
 				}
 			}));
 };
-var _user$project$Main$main = _elm_lang$html$Html$program(
-	{init: _user$project$Main$init, view: _user$project$Main$view, subscriptions: _user$project$Main$subscriptions, update: _user$project$Main$update})();
-var _user$project$Main$NoAction = {ctor: 'NoAction'};
+var _user$project$Form$formMainProgram = F3(
+	function (inputs, postUrl, vs) {
+		return _elm_lang$html$Html$program(
+			{
+				init: {
+					ctor: '_Tuple2',
+					_0: A3(_user$project$Form$initialModelWith, inputs, postUrl, vs),
+					_1: _elm_lang$core$Platform_Cmd$none
+				},
+				view: _user$project$Form$view,
+				subscriptions: _user$project$Form$subscriptions,
+				update: _user$project$Form$update
+			});
+	});
+var _user$project$Form$NoAction = {ctor: 'NoAction'};
+
+var _user$project$Main$minLength = F2(
+	function (n, s) {
+		return _elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$String$length(s),
+			n) > -1;
+	});
+var _user$project$Main$validations = {
+	ctor: '::',
+	_0: {
+		ctor: '_Tuple2',
+		_0: 'user_name',
+		_1: A2(
+			_user$project$Form$withPredicate,
+			function (_p0) {
+				return !_elm_lang$core$String$isEmpty(_p0);
+			},
+			'User name can\'t be empty')
+	},
+	_1: {
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: 'user_mail',
+			_1: A2(
+				_user$project$Form$withPredicate,
+				_elm_lang$core$String$contains('@'),
+				'Doesn\'t seem like a valid email')
+		},
+		_1: {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'user_passwd',
+				_1: A2(
+					_user$project$Form$withPredicate,
+					_user$project$Main$minLength(6),
+					'Passwords must be at least 6 characters long')
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'user_name',
+					_1: A2(
+						_user$project$Form$withPredicate,
+						_user$project$Main$minLength(3),
+						'User name is too short')
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'user_name',
+						_1: A2(
+							_user$project$Form$withPredicate,
+							function (_p1) {
+								return !A2(_elm_lang$core$String$contains, ' ', _p1);
+							},
+							'User name cant contain spaces')
+					},
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	}
+};
+var _user$project$Main$inputs = {
+	ctor: '::',
+	_0: A5(_user$project$Form$textInputWithTrigger, _user$project$Form$OnInputChange, 'user_name', 'Username: ', 'Enter your username', _user$project$Form$Mass),
+	_1: {
+		ctor: '::',
+		_0: A4(_user$project$Form$emailInput, 'user_mail', 'Email: ', 'example@gmail.com', _user$project$Form$Mass),
+		_1: {
+			ctor: '::',
+			_0: A3(_user$project$Form$passwordInput, 'user_passwd', 'Password: ', _user$project$Form$Queued),
+			_1: {
+				ctor: '::',
+				_0: A3(_user$project$Form$passwordInput, 'user_passwd', 'Password confirm: ', _user$project$Form$Queued),
+				_1: {ctor: '[]'}
+			}
+		}
+	}
+};
+var _user$project$Main$main = A3(_user$project$Form$formMainProgram, _user$project$Main$inputs, 'http://localhost:5000/signup', _user$project$Main$validations)();
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
