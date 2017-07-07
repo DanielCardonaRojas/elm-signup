@@ -6,6 +6,8 @@ import Json.Decode as JsonD
 import Json.Decode exposing (Decoder)
 
 import Form exposing (..)
+import Form.Types exposing (..)
+import Form.Input exposing (..)
 
 main = formMainProgram inputs "http://localhost:5000/signup" validations
 

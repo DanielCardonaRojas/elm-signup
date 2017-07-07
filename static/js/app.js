@@ -9033,21 +9033,40 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
-var _user$project$Form$withPredicate = F3(
-	function (p, errorMessage, i) {
-		return p(i.value) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(errorMessage);
+var _user$project$Form_Types$Input = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {value: a, name: b, label: c, placeholder: d, inputType: e, errors: f, validationStyle: g, validationTrigger: h, hideValidations: i};
 	});
-var _user$project$Form$formErrors = function (inputs) {
-	return A3(
-		_elm_lang$core$List$foldl,
-		F2(
-			function (i, acc) {
-				return _elm_lang$core$List$length(i.errors) + acc;
-			}),
-		0,
-		inputs);
+var _user$project$Form_Types$SubmitForm = {ctor: 'SubmitForm'};
+var _user$project$Form_Types$ServerReplied = function (a) {
+	return {ctor: 'ServerReplied', _0: a};
 };
-var _user$project$Form$inputValidator = F2(
+var _user$project$Form_Types$FieldAction = function (a) {
+	return {ctor: 'FieldAction', _0: a};
+};
+var _user$project$Form_Types$NoAction = {ctor: 'NoAction'};
+var _user$project$Form_Types$InputChanged = F2(
+	function (a, b) {
+		return {ctor: 'InputChanged', _0: a, _1: b};
+	});
+var _user$project$Form_Types$FocusedIn = function (a) {
+	return {ctor: 'FocusedIn', _0: a};
+};
+var _user$project$Form_Types$FocusedOut = function (a) {
+	return {ctor: 'FocusedOut', _0: a};
+};
+var _user$project$Form_Types$Queued = {ctor: 'Queued'};
+var _user$project$Form_Types$Mass = {ctor: 'Mass'};
+var _user$project$Form_Types$OnBlur = {ctor: 'OnBlur'};
+var _user$project$Form_Types$OnInputChange = {ctor: 'OnInputChange'};
+
+var _user$project$Form_Input$toggleInputValidationsOn = F3(
+	function (pred, b, i) {
+		return pred(i.name) ? _elm_lang$core$Native_Utils.update(
+			i,
+			{hideValidations: b}) : i;
+	});
+var _user$project$Form_Input$inputValidator = F2(
 	function (i, validations) {
 		return A2(
 			_elm_lang$core$List$filterMap,
@@ -9058,59 +9077,7 @@ var _user$project$Form$inputValidator = F2(
 			},
 			validations);
 	});
-var _user$project$Form$serverResponseDecoder = function (d) {
-	return A2(
-		_elm_lang$core$Json_Decode$andThen,
-		function (m) {
-			var _p0 = _elm_lang$core$String$toLower(m);
-			switch (_p0) {
-				case 'ok':
-					return A2(
-						_elm_lang$core$Json_Decode$map,
-						_elm_lang$core$Result$Ok,
-						A2(_elm_lang$core$Json_Decode$field, 'data', d));
-				case 'success':
-					return A2(
-						_elm_lang$core$Json_Decode$map,
-						_elm_lang$core$Result$Ok,
-						A2(_elm_lang$core$Json_Decode$field, 'data', d));
-				case 'fail':
-					return A2(
-						_elm_lang$core$Json_Decode$map,
-						_elm_lang$core$Result$Err,
-						A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string));
-				case 'error':
-					return A2(
-						_elm_lang$core$Json_Decode$map,
-						_elm_lang$core$Result$Err,
-						A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string));
-				default:
-					return A2(
-						_elm_lang$core$Json_Decode$map,
-						_elm_lang$core$Result$Err,
-						_elm_lang$core$Json_Decode$succeed('Unkown error, server didnt respond with expected structure'));
-			}
-		},
-		A2(_elm_lang$core$Json_Decode$field, 'status', _elm_lang$core$Json_Decode$string));
-};
-var _user$project$Form$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$none;
-};
-var _user$project$Form$toggleValidationsOnInput = F3(
-	function (model, input, b) {
-		var modifiedInputs = A2(
-			_elm_lang$core$List$map,
-			function (i) {
-				return _elm_lang$core$Native_Utils.eq(i.name, input.name) ? _elm_lang$core$Native_Utils.update(
-					i,
-					{hideValidations: b}) : i;
-			},
-			model.inputs);
-		return _elm_lang$core$Native_Utils.update(
-			model,
-			{inputs: modifiedInputs});
-	});
-var _user$project$Form$updateInput = F4(
+var _user$project$Form_Input$updateInput = F4(
 	function (changedInput, newValue, validations, storedInput) {
 		if (_elm_lang$core$Native_Utils.eq(changedInput.name, storedInput.name)) {
 			var updatedField = _elm_lang$core$Native_Utils.update(
@@ -9119,188 +9086,19 @@ var _user$project$Form$updateInput = F4(
 			return _elm_lang$core$Native_Utils.update(
 				updatedField,
 				{
-					errors: A2(_user$project$Form$inputValidator, updatedField, validations)
+					errors: A2(_user$project$Form_Input$inputValidator, updatedField, validations)
 				});
 		} else {
 			return storedInput;
 		}
 	});
-var _user$project$Form$initialModelWith = F3(
-	function (inputs, postUrl, validations) {
-		return {
-			inputs: inputs,
-			postUrl: postUrl,
-			serverResponse: _elm_lang$core$Result$Ok(''),
-			programErrors: '',
-			validations: validations
-		};
-	});
-var _user$project$Form$Model = F5(
-	function (a, b, c, d, e) {
-		return {inputs: a, postUrl: b, serverResponse: c, programErrors: d, validations: e};
-	});
-var _user$project$Form$Input = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {value: a, name: b, label: c, placeholder: d, inputType: e, errors: f, validationStyle: g, validationTrigger: h, hideValidations: i};
-	});
-var _user$project$Form$textInputWithTrigger = F5(
-	function (trigger, name, label, placeholder, style) {
-		return A9(
-			_user$project$Form$Input,
-			'',
-			name,
-			label,
-			placeholder,
-			'text',
-			{ctor: '[]'},
-			style,
-			trigger,
-			true);
-	});
-var _user$project$Form$emailInputWithTrigger = F5(
-	function (trigger, name, label, placeholder, style) {
-		return A9(
-			_user$project$Form$Input,
-			'',
-			name,
-			label,
-			placeholder,
-			'email',
-			{ctor: '[]'},
-			style,
-			trigger,
-			true);
-	});
-var _user$project$Form$passwordInputWithTrigger = F4(
-	function (trigger, name, label, style) {
-		return A9(
-			_user$project$Form$Input,
-			'',
-			name,
-			label,
-			'',
-			'password',
-			{ctor: '[]'},
-			style,
-			trigger,
-			true);
-	});
-var _user$project$Form$Queued = {ctor: 'Queued'};
-var _user$project$Form$Mass = {ctor: 'Mass'};
-var _user$project$Form$OnBlur = {ctor: 'OnBlur'};
-var _user$project$Form$textInput = F4(
-	function (name, label, placeholder, style) {
-		return A5(_user$project$Form$textInputWithTrigger, _user$project$Form$OnBlur, name, label, placeholder, style);
-	});
-var _user$project$Form$emailInput = F4(
-	function (name, label, placeholder, style) {
-		return A5(_user$project$Form$emailInputWithTrigger, _user$project$Form$OnBlur, name, label, placeholder, style);
-	});
-var _user$project$Form$passwordInput = F3(
-	function (name, label, style) {
-		return A4(_user$project$Form$passwordInputWithTrigger, _user$project$Form$OnBlur, name, label, style);
-	});
-var _user$project$Form$OnInputChange = {ctor: 'OnInputChange'};
-var _user$project$Form$SubmitForm = {ctor: 'SubmitForm'};
-var _user$project$Form$ServerReplied = function (a) {
-	return {ctor: 'ServerReplied', _0: a};
-};
-var _user$project$Form$loginCmd = function (model) {
-	var loginBody = _elm_lang$http$Http$multipartBody(
-		A2(
-			_elm_lang$core$List$map,
-			function (i) {
-				return A2(_elm_lang$http$Http$stringPart, i.name, i.value);
-			},
-			model.inputs));
-	return A2(
-		_elm_lang$http$Http$send,
-		_user$project$Form$ServerReplied,
-		A3(
-			_elm_lang$http$Http$post,
-			model.postUrl,
-			loginBody,
-			_user$project$Form$serverResponseDecoder(_elm_lang$core$Json_Decode$string)));
-};
-var _user$project$Form$update = F2(
-	function (action, model) {
-		var _p1 = action;
-		switch (_p1.ctor) {
-			case 'NoAction':
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-			case 'InputChanged':
-				var _p2 = _p1._0;
-				var updatedModel = _elm_lang$core$Native_Utils.update(
-					model,
-					{
-						inputs: A2(
-							_elm_lang$core$List$map,
-							A3(_user$project$Form$updateInput, _p2, _p1._1, model.validations),
-							model.inputs)
-					});
-				return (!_elm_lang$core$Native_Utils.eq(_p2.validationTrigger, _user$project$Form$OnInputChange)) ? {ctor: '_Tuple2', _0: updatedModel, _1: _elm_lang$core$Platform_Cmd$none} : {
-					ctor: '_Tuple2',
-					_0: A3(_user$project$Form$toggleValidationsOnInput, updatedModel, _p2, false),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'FocusedOut':
-				return {
-					ctor: '_Tuple2',
-					_0: A3(_user$project$Form$toggleValidationsOnInput, model, _p1._0, false),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'FocusedIn':
-				return {
-					ctor: '_Tuple2',
-					_0: A3(_user$project$Form$toggleValidationsOnInput, model, _p1._0, true),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'SubmitForm':
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: _user$project$Form$loginCmd(model)
-				};
-			default:
-				var _p3 = _p1._0;
-				if (_p3.ctor === 'Ok') {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{serverResponse: _p3._0}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				} else {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								programErrors: _elm_lang$core$Basics$toString(_p3._0)
-							}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				}
-		}
-	});
-var _user$project$Form$FocusedIn = function (a) {
-	return {ctor: 'FocusedIn', _0: a};
-};
-var _user$project$Form$FocusedOut = function (a) {
-	return {ctor: 'FocusedOut', _0: a};
-};
-var _user$project$Form$InputChanged = F2(
-	function (a, b) {
-		return {ctor: 'InputChanged', _0: a, _1: b};
-	});
-var _user$project$Form$viewInput = function (i) {
+var _user$project$Form_Input$viewInput = function (i) {
 	var errorList = function (i) {
 		return i.hideValidations ? {
 			ctor: '::',
 			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
-		} : (_elm_lang$core$Native_Utils.eq(i.validationStyle, _user$project$Form$Queued) ? {
+		} : (_elm_lang$core$Native_Utils.eq(i.validationStyle, _user$project$Form_Types$Queued) ? {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$li,
@@ -9334,15 +9132,15 @@ var _user$project$Form$viewInput = function (i) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Events$onInput(
-						_user$project$Form$InputChanged(i)),
+						_user$project$Form_Types$InputChanged(i)),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onBlur(
-							_user$project$Form$FocusedOut(i)),
+							_user$project$Form_Types$FocusedOut(i)),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onFocus(
-								_user$project$Form$FocusedIn(i)),
+								_user$project$Form_Types$FocusedIn(i)),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$placeholder(i.placeholder),
@@ -9409,6 +9207,214 @@ var _user$project$Form$viewInput = function (i) {
 			}
 		});
 };
+var _user$project$Form_Input$passwordInputWithTrigger = F4(
+	function (trigger, name, label, style) {
+		return A9(
+			_user$project$Form_Types$Input,
+			'',
+			name,
+			label,
+			'',
+			'password',
+			{ctor: '[]'},
+			style,
+			trigger,
+			true);
+	});
+var _user$project$Form_Input$passwordInput = F3(
+	function (name, label, style) {
+		return A4(_user$project$Form_Input$passwordInputWithTrigger, _user$project$Form_Types$OnBlur, name, label, style);
+	});
+var _user$project$Form_Input$emailInputWithTrigger = F5(
+	function (trigger, name, label, placeholder, style) {
+		return A9(
+			_user$project$Form_Types$Input,
+			'',
+			name,
+			label,
+			placeholder,
+			'email',
+			{ctor: '[]'},
+			style,
+			trigger,
+			true);
+	});
+var _user$project$Form_Input$emailInput = F4(
+	function (name, label, placeholder, style) {
+		return A5(_user$project$Form_Input$emailInputWithTrigger, _user$project$Form_Types$OnBlur, name, label, placeholder, style);
+	});
+var _user$project$Form_Input$textInputWithTrigger = F5(
+	function (trigger, name, label, placeholder, style) {
+		return A9(
+			_user$project$Form_Types$Input,
+			'',
+			name,
+			label,
+			placeholder,
+			'text',
+			{ctor: '[]'},
+			style,
+			trigger,
+			true);
+	});
+var _user$project$Form_Input$textInput = F4(
+	function (name, label, placeholder, style) {
+		return A5(_user$project$Form_Input$textInputWithTrigger, _user$project$Form_Types$OnBlur, name, label, placeholder, style);
+	});
+
+var _user$project$Form$withPredicate = F3(
+	function (p, errorMessage, i) {
+		return p(i.value) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(errorMessage);
+	});
+var _user$project$Form$formErrors = function (inputs) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (i, acc) {
+				return _elm_lang$core$List$length(i.errors) + acc;
+			}),
+		0,
+		inputs);
+};
+var _user$project$Form$serverResponseDecoder = function (d) {
+	return A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (m) {
+			var _p0 = _elm_lang$core$String$toLower(m);
+			switch (_p0) {
+				case 'ok':
+					return A2(
+						_elm_lang$core$Json_Decode$map,
+						_elm_lang$core$Result$Ok,
+						A2(_elm_lang$core$Json_Decode$field, 'data', d));
+				case 'success':
+					return A2(
+						_elm_lang$core$Json_Decode$map,
+						_elm_lang$core$Result$Ok,
+						A2(_elm_lang$core$Json_Decode$field, 'data', d));
+				case 'fail':
+					return A2(
+						_elm_lang$core$Json_Decode$map,
+						_elm_lang$core$Result$Err,
+						A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string));
+				case 'error':
+					return A2(
+						_elm_lang$core$Json_Decode$map,
+						_elm_lang$core$Result$Err,
+						A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string));
+				default:
+					return A2(
+						_elm_lang$core$Json_Decode$map,
+						_elm_lang$core$Result$Err,
+						_elm_lang$core$Json_Decode$succeed('Unkown error, server didnt respond with expected structure'));
+			}
+		},
+		A2(_elm_lang$core$Json_Decode$field, 'status', _elm_lang$core$Json_Decode$string));
+};
+var _user$project$Form$loginCmd = function (model) {
+	var loginBody = _elm_lang$http$Http$multipartBody(
+		A2(
+			_elm_lang$core$List$map,
+			function (i) {
+				return A2(_elm_lang$http$Http$stringPart, i.name, i.value);
+			},
+			model.inputs));
+	return A2(
+		_elm_lang$http$Http$send,
+		_user$project$Form_Types$ServerReplied,
+		A3(
+			_elm_lang$http$Http$post,
+			model.postUrl,
+			loginBody,
+			_user$project$Form$serverResponseDecoder(_elm_lang$core$Json_Decode$string)));
+};
+var _user$project$Form$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$none;
+};
+var _user$project$Form$toggleValidationsOnInput = F3(
+	function (model, input, b) {
+		var modifiedInputs = A2(
+			_elm_lang$core$List$map,
+			function (i) {
+				return A3(
+					_user$project$Form_Input$toggleInputValidationsOn,
+					function (name) {
+						return _elm_lang$core$Native_Utils.eq(name, input.name);
+					},
+					b,
+					i);
+			},
+			model.inputs);
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{inputs: modifiedInputs});
+	});
+var _user$project$Form$update = F2(
+	function (action, model) {
+		var _p1 = action;
+		switch (_p1.ctor) {
+			case 'NoAction':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'FieldAction':
+				var _p2 = _p1._0;
+				switch (_p2.ctor) {
+					case 'InputChanged':
+						var _p3 = _p2._0;
+						var updatedModel = _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								inputs: A2(
+									_elm_lang$core$List$map,
+									A3(_user$project$Form_Input$updateInput, _p3, _p2._1, model.validations),
+									model.inputs)
+							});
+						return (!_elm_lang$core$Native_Utils.eq(_p3.validationTrigger, _user$project$Form_Types$OnInputChange)) ? {ctor: '_Tuple2', _0: updatedModel, _1: _elm_lang$core$Platform_Cmd$none} : {
+							ctor: '_Tuple2',
+							_0: A3(_user$project$Form$toggleValidationsOnInput, updatedModel, _p3, false),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					case 'FocusedOut':
+						return {
+							ctor: '_Tuple2',
+							_0: A3(_user$project$Form$toggleValidationsOnInput, model, _p2._0, false),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					default:
+						return {
+							ctor: '_Tuple2',
+							_0: A3(_user$project$Form$toggleValidationsOnInput, model, _p2._0, true),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+				}
+			case 'SubmitForm':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Form$loginCmd(model)
+				};
+			default:
+				var _p4 = _p1._0;
+				if (_p4.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{serverResponse: _p4._0}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								programErrors: _elm_lang$core$Basics$toString(_p4._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
+		}
+	});
 var _user$project$Form$view = function (model) {
 	var submitButton = (_elm_lang$core$Native_Utils.cmp(
 		_user$project$Form$formErrors(model.inputs),
@@ -9427,7 +9433,7 @@ var _user$project$Form$view = function (model) {
 		_elm_lang$html$Html$button,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Events$onClick(_user$project$Form$SubmitForm),
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$Form_Types$SubmitForm),
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Attributes$class('btn btn-warning form-control'),
@@ -9440,8 +9446,8 @@ var _user$project$Form$view = function (model) {
 			_1: {ctor: '[]'}
 		});
 	var serverResponse = function () {
-		var _p4 = model.serverResponse;
-		if (_p4.ctor === 'Ok') {
+		var _p5 = model.serverResponse;
+		if (_p5.ctor === 'Ok') {
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -9451,7 +9457,7 @@ var _user$project$Form$view = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p4._0),
+					_0: _elm_lang$html$Html$text(_p5._0),
 					_1: {ctor: '[]'}
 				});
 		} else {
@@ -9464,7 +9470,7 @@ var _user$project$Form$view = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_p4._0),
+					_0: _elm_lang$html$Html$text(_p5._0),
 					_1: {ctor: '[]'}
 				});
 		}
@@ -9478,7 +9484,15 @@ var _user$project$Form$view = function (model) {
 		},
 		A2(
 			_elm_lang$core$Basics_ops['++'],
-			A2(_elm_lang$core$List$map, _user$project$Form$viewInput, model.inputs),
+			A2(
+				_elm_lang$core$List$map,
+				function (_p6) {
+					return A2(
+						_elm_lang$html$Html$map,
+						_user$project$Form_Types$FieldAction,
+						_user$project$Form_Input$viewInput(_p6));
+				},
+				model.inputs),
 			{
 				ctor: '::',
 				_0: submitButton,
@@ -9504,6 +9518,16 @@ var _user$project$Form$view = function (model) {
 				}
 			}));
 };
+var _user$project$Form$initialModelWith = F3(
+	function (inputs, postUrl, validations) {
+		return {
+			inputs: inputs,
+			postUrl: postUrl,
+			serverResponse: _elm_lang$core$Result$Ok(''),
+			programErrors: '',
+			validations: validations
+		};
+	});
 var _user$project$Form$formMainProgram = F3(
 	function (inputs, postUrl, vs) {
 		return _elm_lang$html$Html$program(
@@ -9518,7 +9542,10 @@ var _user$project$Form$formMainProgram = F3(
 				update: _user$project$Form$update
 			});
 	});
-var _user$project$Form$NoAction = {ctor: 'NoAction'};
+var _user$project$Form$Model = F5(
+	function (a, b, c, d, e) {
+		return {inputs: a, postUrl: b, serverResponse: c, programErrors: d, validations: e};
+	});
 
 var _user$project$Main$minLength = F2(
 	function (n, s) {
@@ -9588,16 +9615,16 @@ var _user$project$Main$validations = {
 };
 var _user$project$Main$inputs = {
 	ctor: '::',
-	_0: A5(_user$project$Form$textInputWithTrigger, _user$project$Form$OnInputChange, 'user_name', 'Username: ', 'Enter your username', _user$project$Form$Mass),
+	_0: A5(_user$project$Form_Input$textInputWithTrigger, _user$project$Form_Types$OnInputChange, 'user_name', 'Username: ', 'Enter your username', _user$project$Form_Types$Mass),
 	_1: {
 		ctor: '::',
-		_0: A4(_user$project$Form$emailInput, 'user_mail', 'Email: ', 'example@gmail.com', _user$project$Form$Mass),
+		_0: A4(_user$project$Form_Input$emailInput, 'user_mail', 'Email: ', 'example@gmail.com', _user$project$Form_Types$Mass),
 		_1: {
 			ctor: '::',
-			_0: A3(_user$project$Form$passwordInput, 'user_passwd', 'Password: ', _user$project$Form$Queued),
+			_0: A3(_user$project$Form_Input$passwordInput, 'user_passwd', 'Password: ', _user$project$Form_Types$Queued),
 			_1: {
 				ctor: '::',
-				_0: A3(_user$project$Form$passwordInput, 'user_passwd', 'Password confirm: ', _user$project$Form$Queued),
+				_0: A3(_user$project$Form_Input$passwordInput, 'user_passwd', 'Password confirm: ', _user$project$Form_Types$Queued),
 				_1: {ctor: '[]'}
 			}
 		}

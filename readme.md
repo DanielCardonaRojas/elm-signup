@@ -86,3 +86,6 @@ cd client
 - Use flags program in elm to pass in the configuration and window location
 - Implement the Validation trigger option (OnInputChange or OnBlur)
 - Support some form of validation that allows an input validation to succeed or fail depending on another input value 
+- Needs to allow users to decorate the views
+- What about a multistep registration? Using fieldsets ?
+- Use iziToast.js or some library to show server notification just to showcase
